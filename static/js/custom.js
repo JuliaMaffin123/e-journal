@@ -193,16 +193,16 @@ if ($(".progress .progress-bar")[0]) {
 // /Progressbar
 
 // Switchery
-$(document).ready(function() {
-    if ($(".js-switch")[0]) {
-        var elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
-        elems.forEach(function (html) {
-            var switchery = new Switchery(html, {
-                color: '#26B99A'
-            });
-        });
-    }
-});
+//$(document).ready(function() {
+//    if ($(".js-switch")[0]) {
+//        var elems = Array.prototype.slice.call(document.querySelectorAll('.js-switch'));
+//        elems.forEach(function (html) {
+//            var switchery = new Switchery(html, {
+//                color: '#26B99A'
+//            });
+//        });
+//    }
+//});
 // /Switchery
 
 
@@ -5029,8 +5029,8 @@ if (typeof NProgress != 'undefined') {
 		init_morris_charts();
 		init_skycons();
 		init_select2();
-		init_validator();
-		init_DataTables();
+		//init_validator();
+		//init_DataTables();
 		init_chart_doughnut();
 		init_gauge();
 		init_PNotify();

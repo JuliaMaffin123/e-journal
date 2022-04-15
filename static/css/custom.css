@@ -4252,3 +4252,55 @@ table thead .checkbox.radio { margin-top:-7px;margin-top:-21px; }
     background-color: #ffff !important;
 }
 /** /bootstrap-datetimepicker **/
+
+/** CUSTOM **/
+.tButtons {
+	float: right;
+	padding-left: 5px;
+}
+.tButtons div.dt-buttons {
+	margin-bottom: 5px;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: 0px;
+}
+.pagination>li>a, .pagination>li>span {
+    margin-left: 0px;
+}
+table.dataTable tbody>tr.selected, table.dataTable tbody>tr>.selected {
+    color: #000;
+    background-color: #daf6e0;
+}
+table.dataTable thead .sorting, table.dataTable thead .sorting_asc, table.dataTable thead .sorting_desc {
+    background-image: none;
+}
+.form-group .switchery {
+    margin: 6px 0;
+}
+.form-group .input-group {
+    margin-bottom: 0px;
+    padding-right: 10px;
+    padding-left: 10px;
+}
+
+.bootstrap-datetimepicker-widget table td span {
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    margin: 0;
+}
+
+.bootstrap-datetimepicker-widget table td {
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+}
+
+.modal-header {
+    color: #ffffff;
+    background: #2a542d;
+    margin: -1px;
+}
+.modal {
+    top: 25%;
+}

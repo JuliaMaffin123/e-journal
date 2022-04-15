@@ -26,9 +26,10 @@
 
             </p>
 
-            <table id="datatable-responsive" class="table table-striped table-bordered dt-responsive nowrap" cellspacing="0" width="100%">
+            <table id="datatable-users" class="table table-striped table-bordered dt-responsive nowrap dataTable" cellspacing="0" width="100%">
                 <thead>
                     <tr>
+                        <th title="ID"><i class="fa fa-key"></i></th>
                         <th>Фамилия</th>
                         <th>Имя</th>
                         <th>Отчесво</th>
@@ -36,15 +37,19 @@
                         <th>Логин</th>
                         <th>Роль</th>
                         <th>Активен</th>
+                        <th>CLASS_ID</th>
+                        <th>ROLE</th>
+                        <th>ACTIVE</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for user in users %}
                     <tr>
+                        <td>{{ user.id }}</td>
                         <td>{{ user.surname }}</td>
                         <td>{{ user.name }}</td>
                         <td>{{ user.otchestvo }}</td>
-                        <td>5А</td>
+                        <td>{{ user.number }}-{{ user.letter }}</td>
                         <td>{{ user.login }}</td>
                         {% if user.role == 'admin' %}
                         <td>АДМИН</td>
@@ -60,6 +65,9 @@
                         {% else %}
                         <td>ДА</td>
                         {% endif %}
+                        <td>{{ user.class_id }}</td>
+                        <td>{{ user.role }}</td>
+                        <td>{{ user.active }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -68,5 +76,211 @@
     </div>
 </div>
 
+<!-- MODAL -->
+<div class="modal" id="MAIN_DIALOG" tabindex="-1" role="dialog" aria-labelledby="dialogLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><i class="fa fa-times-circle-o"></i></span></button>
+                <h4 class="modal-title" id="dialogLabel"><i class="fa fa-pencil"></i> Изменение данных пользователя</h4>
+            </div>
+            <div class="modal-body" id="modal_body">
+                <form id="editForm" action="" method="POST" class="form-horizontal form-label-left" novalidate>
+                    {{ form.csrf_token() }}
+                    <input id="id" name="id" type="hidden">
 
+                    <div class="item form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="surname">Фамилия <span class="required">*</span></label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            <input id="surname" name="surname" class="form-control col-md-7 col-xs-12" data-validate-length-range="100" required="required" type="text">
+                        </div>
+                    </div>
+                    <div class="item form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="name">Имя <span class="required">*</span></label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            <input id="name" name="name" class="form-control col-md-7 col-xs-12" data-validate-length-range="100" required="required" type="text">
+                        </div>
+                    </div>
+                    <div class="item form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="otchestvo">Отчество <span class="required">*</span></label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            <input id="otchestvo" name="otchestvo" class="form-control col-md-7 col-xs-12" type="text">
+                        </div>
+                    </div>
+                    <div class="item form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="login">Логин <span class="required">*</span></label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            <input id="login" name="login" class="form-control col-md-7 col-xs-12" type="text" readonly>
+                        </div>
+                    </div>
+                    <div class="item form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="role">Роль</label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            <select class="form-control" id="role" name="role">
+                                <option value="admin">Администратор</option>
+                                <option value="teacher">Учитель</option>
+                                <option value="student">Ученик</option>
+                                <option value="guest">Гость</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="item form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="class_id">ID класса</label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            <input id="class_id" name="class_id" class="form-control col-md-7 col-xs-12" required="required" type="text">
+                        </div>
+                    </div>
+                    <div class="item form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="active">Активен</label>
+                        <div class="col-md-6 col-sm-6 col-xs-12">
+                            <input id="active" name="active" class="form-control js-switch" type="checkbox">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+                <button type="button" class="btn btn-success" id="saveButton">Сохранить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    var onoffSwitcher;
+	var selectedRow = -1;
+
+    /* Инициализация страницы */
+    $(document).ready(function() {
+        //init_Filter();
+        init_Switcher();
+        init_DataTables();
+        init_Validator();
+    });
+
+    /* Инициализация DATA-TABLE */
+    function init_DataTables() {
+        if( typeof ($.fn.DataTable) === 'undefined'){ return; }
+        console.log('init_DataTables');
+
+        var table = $("#datatable-users").DataTable({
+            fixedHeader: true,
+            processing: true,
+            rowId: 'id',
+            columns: [
+                {data: "id", width: "5%" },
+                {data: "surname", width: "35%"  },
+                {data: "name", width: "15%"  },
+                {data: "otchestvo", width: "15%"  },
+                {data: "class", width: "5%"  },
+                {data: "login", width: "5%"  },
+                {data: "role_name", width: "5%"  },
+                {data: "activity", width: "5%"  },
+                {data: "class_id", visible: false},
+                {data: "role", visible: false},
+                {data: "active", visible: false}
+            ],
+            order: [1, 'asc'],
+            dom: '<"top"l<"tButtons"B>f>rt<"bottom"ip><"clear">',
+            buttons: [
+                {text: '<i class="fa fa-pencil"></i>',
+                    className: 'btn-sm btn-warning editButton',
+                    titleAttr: 'Редактировать',
+                    enabled: false,
+                    action: function ( e, dt, node, config ) {
+                        console.log('Edit button clicked by row index=' + selectedRow);
+                        var row = table.rows(selectedRow);
+                        editRow(row);
+                    }
+                }
+            ]
+        });
+
+        // Ресайз таблицы при изменении размеров окна
+        $("#datatable-users").css("width", "100%");
+
+        // Выделение строк таблицы и активация кнопки редактирования
+        $("#datatable-users tbody").on('click', 'tr', function() {
+            console.log('Row onClick');
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+                $(".editButton").addClass('disabled');
+                selectedRow = -1;
+            } else {
+                table.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+                $(".editButton").removeClass('disabled');
+                selectedRow = table.row(this).index();
+            }
+        });
+    };
+
+    /* Редактирование строки */
+    function editRow(row) {
+        // Сбрасываем пометки валидации
+        $("#MAIN_DIALOG").find(".form-group").removeClass("bad");
+        $("#MAIN_DIALOG").find("div.alert").remove();
+
+        // Наполняем контролы данными из строки
+        var data = row.data()[0];
+        console.log('editRow: ' + data);
+        $("#id").val(data.id);
+        $("#surname").val(data.surname);
+        $("#name").val(data.name);
+        $("#otchestvo").val(data.otchestvo);
+        $("#login").val(data.login);
+        $("#role").val(data.role);
+        $("#class_id").val(data.class_id);
+        setSwitchery(onoffSwitcher, data.active == 1);
+        $('#MAIN_DIALOG').modal();
+    }
+
+    function setSwitchery(switchElement, checkedBool) {
+        if ((checkedBool && !switchElement.isChecked()) || (!checkedBool && switchElement.isChecked())) {
+            switchElement.setPosition(true);
+            switchElement.handleOnchange(true);
+        }
+    }
+
+    /* Инициализирует переключателей */
+    function init_Switcher() {
+        console.log('Init switcher');
+        var onoff = document.getElementById('active');
+        onoffSwitcher = new Switchery(onoff, {
+            color: '#26B99A'
+        });
+    }
+
+    /* Инициализация валидатора */
+    function init_Validator() {
+        if( typeof (validator) === 'undefined') { return; }
+        console.log('init_Validator');
+        var form = $('#MAIN_DIALOG');
+
+        // initialize the validator function
+        validator.message.date = 'некорректная дата';
+        validator.message.number_min = 'меньше допустимого';
+        validator.message.number_max = 'больше допустимого';
+
+        // validate a field on "blur" event, a 'select' on 'change' event & a '.reuired' classed multifield on 'keyup':
+        form.on('blur', 'input[required], input.optional, select.required', validator.checkField)
+            .on('change', 'select.required', validator.checkField)
+            .on('keypress', 'input[required][pattern]', validator.keypress);
+
+        $('.multi.required').on('keyup blur', 'input', function() {
+            validator.checkField.apply($(this).siblings().last()[0]);
+        });
+        $('#saveButton').on('click', function(e) {
+            e.preventDefault();
+            if (validator.checkAll($(form))) {
+                document.getElementById("editForm").submit();
+            }
+            return false;
+        });
+    };
+
+</script>
 {% endblock %}

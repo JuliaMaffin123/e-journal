@@ -1,7 +1,9 @@
-from flask import Flask, render_template, request, redirect
+import json
+
+from flask import Flask, render_template, request, redirect, jsonify
 from flask_login import LoginManager, current_user, login_user, logout_user, login_fresh
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, Length, EqualTo
 
 from data import db_session
@@ -77,15 +79,16 @@ def login():
                 return render_template('login_form.html',
                                        message="Пароли должны совпадать",
                                        formL=formL, formR=formR)
-            newUser = Users(name=formR.name.data,
-                            surname=formR.surname.data,
-                            otchestvo=formR.otchestvo.data,
-                            login=formR.username.data,
-                            password=formR.password.data,
-                            role="guest",
-                            active=1,
-                            class_id=1)
-            db_sess.add(newUser)
+            new_user = Users()
+            new_user.name = formR.name.data
+            new_user.surname = formR.surname.data
+            new_user.otchestvo = formR.otchestvo.data
+            new_user.login = formR.username.data
+            new_user.password = formR.password.data
+            new_user.role = "guest"
+            new_user.active = 1
+            new_user.class_id = 1
+            db_sess.add(new_user)
             db_sess.commit()
             return render_template('page_guest.html', name=formR.name.data, surname=formR.surname.data)
         return render_template('login_form.html', formL=formL, formR=formR)
@@ -133,11 +136,50 @@ def admin_dashboard():
                        guest=guest_cnt)
 
 
-@app.route('/admin/users')
+class UserEditForm(FlaskForm):
+    identifier = StringField()
+    id = StringField('ID')
+    surname = StringField('Фамилия', validators=[DataRequired()])
+    name = StringField('Имя', validators=[DataRequired()])
+    otchestvo = StringField('Отчество')
+    role = StringField('Роль')
+    class_id = StringField('ID класса')
+    active = BooleanField('Активен')
+
+
+@app.route('/admin/users', methods=['POST', 'GET'])
 def admin_users():
     db_sess = db_session.create_session()
-    users = db_sess.query(Users).all()
-    return render_page(['admin'], '/admin/users', 'admin_users.html', users=users)
+    form = UserEditForm()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            # сохраним данные
+            user = db_sess.query(Users).get(form.id.data)
+            if user:
+                user.surname = form.surname.data
+                user.name = form.name.data
+                user.otchestvo = form.otchestvo.data
+                user.role = form.role.data
+                user.class_id = form.class_id.data
+                user.active = 1 if form.active.data else 0
+                db_sess.commit()
+            else:
+                print(f"Что-то пошло не так... Пользоватеь с id={form.id.data} не найден!")
+    # Начитаем данные и заустим страницу
+    # users = db_sess.query(Users).all()
+    users = db_sess.query(Users.id,
+                          Users.class_id,
+                          Users.name,
+                          Users.otchestvo,
+                          Users.surname,
+                          Users.login,
+                          Users.role,
+                          Users.active,
+                          Classes.number,
+                          Classes.letter).filter(Users.class_id == Classes.cl_id).all()
+    # print("JSON:", json.dumps([x.__json__() for x in users]))
+    # jsonify([x.__json__() for x in users])
+    return render_page(['admin'], '/admin/users', 'admin_users.html', users=users, form=form)
 
 
 @app.route('/teacher/schedule')

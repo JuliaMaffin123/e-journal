@@ -3,7 +3,18 @@ import sqlalchemy.orm as orm
 from sqlalchemy.orm import Session
 import sqlalchemy.ext.declarative as dec
 
-ORMBase = dec.declarative_base()
+
+class ORMBase(object):
+    def __json__(self):
+        json_exclude = getattr(self, '__json_exclude__', set())
+        return {key: value for key, value in self.__dict__.items()
+                # Do not serialize 'private' attributes
+                # (SQLAlchemy-internal attributes are among those, too)
+                if not key.startswith('_')
+                and key not in json_exclude}
+
+
+ORMBase = dec.declarative_base(cls=ORMBase)
 
 # Фабрика подключений
 __factory = None
