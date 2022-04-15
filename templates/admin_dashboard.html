@@ -1,0 +1,36 @@
+{% extends "page_base.html" %}
+
+{% block title %}Дашборд администратора{% endblock %}
+
+{% block content %}
+
+<!-- top tiles -->
+<div class="row tile_count">
+    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+        <span class="count_top"><i class="fa fa-sitemap"></i> Всего классов</span>
+        <div class="count blue">{{ classes }}</div>
+    </div>
+    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+        <span class="count_top"><i class="fa fa-users"></i> Всего пользователей</span>
+        <div class="count">{{ active }}</div>
+    </div>
+    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+        <span class="count_top"><i class="fa fa-user"></i> Учителей</span>
+        <div class="count green">{{ teacher }}</div>
+    </div>
+    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+        <span class="count_top"><i class="fa fa-graduation-cap"></i> Студентов</span>
+        <div class="count green">{{ student }}</div>
+    </div>
+    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+        <span class="count_top"><i class="fa fa-close"></i> Выбыло</span>
+        <div class="count red">{{ inactive }}</div>
+    </div>
+    <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+        <span class="count_top"><i class="fa fa-child"></i> Ожидают активации</span>
+        <div class="count blue">{{ guest }}</div>
+    </div>
+</div>
+<!-- /top tiles -->
+
+{% endblock %}

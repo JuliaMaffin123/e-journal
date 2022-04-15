@@ -1,0 +1,50 @@
+{% extends "student_base.html" %}
+
+{% block title %}Дневник{% endblock %}
+
+{% block content %}
+<br><br><br>
+<div class="main">
+    <div class="container">
+        <h1 align="center">Дневник</h1>
+        </br>
+        {% for day in days.keys() %}
+        <h4 align="center">{{day}}</h4>
+        <table align="center" class="table table-bordered">
+            <tr>
+                <td width="10">08:30</td>
+                <td align="center" width="150">{{ days[day][0][0] }}</td>
+                <td>{{ days[day][0][1] }}</td>
+                <td width="60"></td>
+            </tr>
+            <tr>
+                <td width="10">09:25</td>
+                <td align="center" width="150">{{ days[day][1][0] }}</td>
+                <td>{{ days[day][1][1] }}</td>
+                <td width="60"></td>
+            </tr>
+            <tr>
+                <td width="10">10:30</td>
+                <td align="center" width="150">{{ days[day][2][0] }}</td>
+                <td>{{ days[day][2][1] }}</td>
+                <td width="60"></td>
+            </tr>
+            <tr>
+                <td width="10">11:25</td>
+                <td align="center" width="150">{{ days[day][3][0] }}</td>
+                <td>{{ days[day][3][1] }}</td>
+                <td width="60"></td>
+            </tr>
+            <tr>
+                <td width="10">12:30</td>
+                <td align="center" width="150">{{ days[day][4][0] }}</td>
+                <td>{{ days[day][4][1] }}</td>
+                <td width="60"></td>
+            </tr>
+            </br>
+        </table>
+        {% endfor %}
+        </br>
+    </div>
+</div>
+{% endblock %}

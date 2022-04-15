@@ -1,0 +1,76 @@
+{% extends "teacher_base.html" %}
+
+{% block title %}Расписание для класса #тут класс будет{% endblock %}
+
+{% block content %}
+</br></br></br>
+<div class="main">
+    <div class="container">
+        <p class="fs-1">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-xxl-2 col-lg-4 col-sm-6">
+                    <h4>Понедельник</h4>
+                    <ul class="list-group">
+                        <li class="list-group-item">{{days['Понедельник'][0]}}</li>
+                        <li class="list-group-item">{{days['Понедельник'][1]}}</li>
+                        <li class="list-group-item">{{days['Понедельник'][2]}}</li>
+                        <li class="list-group-item">{{days['Понедельник'][3]}}</li>
+                        <li class="list-group-item">{{days['Понедельник'][4]}}</li>
+                    </ul>
+                </div>
+                <div class="col-xxl-2 col-lg-4 col-sm-6">
+                    <h4>Вторник</h4>
+                    <ul class="list-group">
+                        <li class="list-group-item">{{days['Вторник'][0]}}</li>
+                        <li class="list-group-item">{{days['Вторник'][1]}}</li>
+                        <li class="list-group-item">{{days['Вторник'][2]}}</li>
+                        <li class="list-group-item">{{days['Вторник'][3]}}</li>
+                        <li class="list-group-item">{{days['Вторник'][4]}}</li>
+                    </ul>
+                </div>
+                <div class="col-xxl-2 col-lg-4 col-sm-6">
+                    <h4>Среда</h4>
+                    <ul class="list-group">
+                        <li class="list-group-item">{{days['Среда'][0]}}</li>
+                        <li class="list-group-item">{{days['Среда'][1]}}</li>
+                        <li class="list-group-item">{{days['Среда'][2]}}</li>
+                        <li class="list-group-item">{{days['Среда'][3]}}</li>
+                        <li class="list-group-item">{{days['Среда'][4]}}</li>
+                    </ul>
+                </div>
+                <div class="col-xxl-2 col-lg-4 col-sm-6">
+                    <h4>Четверг</h4>
+                    <ul class="list-group">
+                        <li class="list-group-item">{{days['Четверг'][0]}}</li>
+                        <li class="list-group-item">{{days['Четверг'][1]}}</li>
+                        <li class="list-group-item">{{days['Четверг'][2]}}</li>
+                        <li class="list-group-item">{{days['Четверг'][3]}}</li>
+                        <li class="list-group-item">{{days['Четверг'][4]}}</li>
+                    </ul>
+                </div>
+                <div class="col-xxl-2 col-lg-4 col-sm-6">
+                    <h4>Пятница</h4>
+                    <ul class="list-group">
+                        <li class="list-group-item">{{days['Пятница'][0]}}</li>
+                        <li class="list-group-item">{{days['Пятница'][1]}}</li>
+                        <li class="list-group-item">{{days['Пятница'][2]}}</li>
+                        <li class="list-group-item">{{days['Пятница'][3]}}</li>
+                        <li class="list-group-item">{{days['Пятница'][4]}}</li>
+                    </ul>
+                </div>
+                <div class="col-xxl-2 col-lg-4 col-sm-6">
+                    <h4>Звонки</h4>
+                    <ul class="list-group">
+                        <li class="list-group-item">08:30</li>
+                        <li class="list-group-item">09:25</li>
+                        <li class="list-group-item">10:30</li>
+                        <li class="list-group-item">11:25</li>
+                        <li class="list-group-item">12:30</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

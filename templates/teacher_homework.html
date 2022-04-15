@@ -1,0 +1,21 @@
+{% extends "teacher_base.html" %}
+
+{% block content %}
+<body>
+<h1 align="center">Вход в систему</h1>
+<div>
+    <form class="login_form" method="post">
+        <input type="login" class="form-control" id="subject" aria-describedby="loginHelp"
+               placeholder="Название предмета" name="subject">
+        <input type="login" class="form-control" id="date" aria-describedby="loginHelp"
+               placeholder="Число, на которое задано" name="date">
+        <input type="login" class="form-control" id="homework" aria-describedby="loginHelp"
+               placeholder="Домашнее задание" name="homework">
+        <button type="submit" class="btn btn-primary">Добавить</button>
+    </form>
+</div>
+<div>
+    {% block homework %}{% endblock %}
+</div>
+</body>
+{% endblock %}
