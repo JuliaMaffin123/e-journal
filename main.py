@@ -1,4 +1,6 @@
+import datetime
 import json
+from json import loads
 
 from flask import Flask, render_template, request, redirect, jsonify
 from flask_login import LoginManager, current_user, login_user, logout_user, login_fresh
@@ -8,6 +10,7 @@ from wtforms.validators import DataRequired, Length, EqualTo
 
 from data import db_session
 from data.classes import Classes
+from data.homeworks import Homeworks
 from data.menu import Menu
 from data.role import Role
 from data.users import Users
@@ -24,11 +27,13 @@ session = db_session.create_session()
 
 @login_manager.user_loader
 def load_user(user_id):
-    db_sess = db_session.create_session()
-    return db_sess.query(Users).get(user_id)
+    return session.query(Users).get(user_id)
 
 
 class LoginForm(FlaskForm):
+    """
+    Форма логина пользователя.
+    """
     identifier = StringField()
     username = StringField('Логин', validators=[DataRequired()])
     password = PasswordField('Пароль', validators=[DataRequired()])
@@ -36,6 +41,9 @@ class LoginForm(FlaskForm):
 
 
 class RegisrationForm(FlaskForm):
+    """
+    Форма регистрации пользователя.
+    """
     identifier = StringField()
     username = StringField('Логин', validators=[DataRequired(), Length(max=64)])
     password = PasswordField(
@@ -52,25 +60,27 @@ class RegisrationForm(FlaskForm):
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
+    """
+    Страница логина/регистрации пользователя.
+    :return:
+    """
     if not login_fresh():
         formL = LoginForm()
         formR = RegisrationForm()
         if formL.identifier.data == 'LOGIN' and formL.validate_on_submit():
-            db_sess = db_session.create_session()
-            user = db_sess.query(Users).filter(Users.login == formL.username.data and Users.active == 1).first()
+            user = session.query(Users).filter(Users.login == formL.username.data and Users.active == 1).first()
             if user and user.password == formL.password.data:
                 if user.role == 'guest':
                     return render_template('page_guest.html', name=user.name, surname=user.surname)
                 else:
-                    role = db_sess.query(Role).filter(Role.name == user.role).first()
+                    role = session.query(Role).filter(Role.name == user.role).first()
                     login_user(user)
                     return redirect(f"/{role.start_page}")
             return render_template('login_form.html',
                                    message="Неправильный логин или пароль",
                                    formL=formL, formR=formR)
         if formR.identifier.data == 'REGISTRATION' and formR.validate_on_submit():
-            db_sess = db_session.create_session()
-            user = db_sess.query(Users).filter(Users.login == formR.username.data).first()
+            user = session.query(Users).filter(Users.login == formR.username.data).first()
             if user:
                 return render_template('login_form.html',
                                        message="Такой логин уже занят",
@@ -88,14 +98,13 @@ def login():
             new_user.role = "guest"
             new_user.active = 1
             new_user.class_id = 1
-            db_sess.add(new_user)
-            db_sess.commit()
+            session.add(new_user)
+            session.commit()
             return render_template('page_guest.html', name=formR.name.data, surname=formR.surname.data)
         return render_template('login_form.html', formL=formL, formR=formR)
     else:
-        db_sess = db_session.create_session()
-        user = db_sess.query(Users).filter(Users.login == current_user.login and Users.active == 1).first()
-        role = db_sess.query(Role).filter(Role.name == user.role).first()
+        user = session.query(Users).filter(Users.login == current_user.login and Users.active == 1).first()
+        role = session.query(Role).filter(Role.name == user.role).first()
         if role == 'guest':
             return render_template('page_guest.html', name=user.name, surname=user.surname)
         else:
@@ -104,14 +113,21 @@ def login():
 
 @app.route('/logout', methods=['GET'])
 def logout():
-    print('current_user.name=' + current_user.name)
+    """
+    Выход пользователя.
+    :return:
+    """
     logout_user()
     return redirect('/')
 
 
 @app.errorhandler(404)
 def page_not_found(e):
-    # note that we set the 404 status explicitly
+    """
+    Ошибка 404 - PAGE NOT FOUND
+    :param e:
+    :return:
+    """
     return render_template('page_error.html',
                            number="404",
                            header="Page not found",
@@ -120,13 +136,16 @@ def page_not_found(e):
 
 @app.route('/admin/dashboard')
 def admin_dashboard():
-    db_sess = db_session.create_session()
-    class_cnt = db_sess.query(Classes).count()
-    teacher_cnt = db_sess.query(Users).filter(Users.role == 'teacher' and Users.active == 1).count()
-    student_cnt = db_sess.query(Users).filter(Users.role == 'student' and Users.active == 1).count()
-    guest_cnt = db_sess.query(Users).filter(Users.role == 'guest' and Users.active == 1).count()
+    """
+    Страница с дашбордом админа.
+    :return:
+    """
+    class_cnt = session.query(Classes).count()
+    teacher_cnt = session.query(Users).filter(Users.role == 'teacher' and Users.active == 1).count()
+    student_cnt = session.query(Users).filter(Users.role == 'student' and Users.active == 1).count()
+    guest_cnt = session.query(Users).filter(Users.role == 'guest' and Users.active == 1).count()
     active_cnt = teacher_cnt + student_cnt
-    inactive_cnt = db_sess.query(Users).filter(Users.active == 0).count()
+    inactive_cnt = session.query(Users).filter(Users.active == 0).count()
     return render_page(['admin'], '/admin/dashboard', 'admin_dashboard.html',
                        classes=class_cnt,
                        active=active_cnt,
@@ -137,6 +156,9 @@ def admin_dashboard():
 
 
 class UserEditForm(FlaskForm):
+    """
+    Форма редактирования пользователя для страницы /admin/users
+    """
     identifier = StringField()
     id = StringField('ID')
     surname = StringField('Фамилия', validators=[DataRequired()])
@@ -149,12 +171,15 @@ class UserEditForm(FlaskForm):
 
 @app.route('/admin/users', methods=['POST', 'GET'])
 def admin_users():
-    db_sess = db_session.create_session()
+    """
+    Страница просмотра/редактрования пользователей для администратора
+    :return:
+    """
     form = UserEditForm()
     if request.method == 'POST':
         if form.validate_on_submit():
             # сохраним данные
-            user = db_sess.query(Users).get(form.id.data)
+            user = session.query(Users).get(form.id.data)
             if user:
                 user.surname = form.surname.data
                 user.name = form.name.data
@@ -162,12 +187,11 @@ def admin_users():
                 user.role = form.role.data
                 user.class_id = form.class_id.data
                 user.active = 1 if form.active.data else 0
-                db_sess.commit()
+                session.commit()
             else:
                 print(f"Что-то пошло не так... Пользоватеь с id={form.id.data} не найден!")
     # Начитаем данные и заустим страницу
-    # users = db_sess.query(Users).all()
-    users = db_sess.query(Users.id,
+    users = session.query(Users.id,
                           Users.class_id,
                           Users.name,
                           Users.otchestvo,
@@ -184,38 +208,72 @@ def admin_users():
 
 @app.route('/teacher/schedule')
 def teacher_schedule():
-    if not login_fresh():
-        return render_403()
-    else:
-        print(current_user.name)
-        db_sess = db_session.create_session()
-        user = db_sess.query(Users).filter(Users.login == current_user.login and Users.active == 1).first()
-        if user.role == 'admin' or user.role == 'teacher':
-            days = {'Понедельник': ['Математика', 'Русский язык', 'Окружающий мир', 'Литература', '-'],
-                    'Вторник': ['ИЗО', 'Математика', 'Русский язык', 'Физ-ра', 'Английский язык'],
-                    'Среда': ['История', 'Информатика', 'Русский язык', 'Технология', '-'],
-                    'Четверг': ['География', 'Физ-ра', 'Математика', 'Русский язык', '-'],
-                    'Пятница': ['Окружающий мир', 'Математика', 'Музыка', 'Литература', '-']
-                    }
-            return render_template('teacher_schedule.html', days=days)
+    """
+    Страница расписания занятий для учителя
+    :return:
+    """
+    clas = session.query(Classes).filter(Classes.cl_id == current_user.class_id).first()
+    sch = loads(session.query(Classes).filter(Classes.cl_id == current_user.class_id).first().schedule)
+    days = {'Понедельник': [x for x in sch['mon']],
+            'Вторник': [x for x in sch['tue']],
+            'Среда': [x for x in sch['wed']],
+            'Четверг': [x for x in sch['thu']],
+            'Пятница': [x for x in sch['fri']]
+            }
+    rngs = loads(session.query(Classes).filter(Classes.cl_id == current_user.class_id).first().time_schedule)
+    times = rngs['day']
+    return render_page(['admin', 'teacher'], '/teacher/schedule', 'teacher_schedule.html', days=days, times=times, clas=clas)
+
+
+@app.route('/teacher/homework/<n>', methods=['POST', 'GET'])
+def teacher_homework(n):
+    """
+    Страница вввода домашних заданий для учителя
+    :return:
+    """
+    cls_cur = session.query(Classes).filter(Classes.cl_id == current_user.class_id).first()
+    if request.method == 'POST':
+        subj = request.form['subj']
+        date = request.form['date']
+        homework = request.form['homework']
+        hw = session.query(Homeworks).filter(Homeworks.class_id == cls_cur.cl_id, Homeworks.subject == subj, Homeworks.date == date).first()
+        if hw:
+            hw.homework = homework
         else:
-            return render_403()
+            hw = Homeworks()
+            hw.class_id = cls_cur.cl_id
+            hw.date = date
+            hw.subject = subj
+            hw.homework = homework
+            session.add(hw)
+        session.commit()
+    class_name = str(cls_cur.number) + '-' + cls_cur.letter
+    today = datetime.datetime.today()
+    today_weekday = datetime.datetime.today().weekday()
+    week_dates = {'Понедельник': str(today - datetime.timedelta(days=(today_weekday - 0 - (int(n) * 7)))).split(' ')[0],
+                  'Вторник': str(today - datetime.timedelta(days=(today_weekday - 1 - (int(n) * 7)))).split(' ')[0],
+                  'Среда': str(today - datetime.timedelta(days=(today_weekday - 2 - (int(n) * 7)))).split(' ')[0],
+                  'Четверг': str(today - datetime.timedelta(days=(today_weekday - 3 - (int(n) * 7)))).split(' ')[0],
+                  'Пятница': str(today - datetime.timedelta(days=(today_weekday - 4 - (int(n) * 7)))).split(' ')[0],
+                  'Суббота': str(today - datetime.timedelta(days=(today_weekday - 5 - (int(n) * 7)))).split(' ')[0],
+                  'Воскресенье': str(today - datetime.timedelta(days=(today_weekday - 6 - (int(n) * 7)))).split(' ')[0]}
+    sch = loads(session.query(Classes).filter(Classes.cl_id == current_user.class_id).first().schedule)
 
-
-@app.route('/teacher/homework', methods=['POST', 'GET'])
-def teacher_homework():
-    if request.method == 'GET':
-        return render_template('teacher_homework.html')
-    elif request.method == 'POST':
-        rec_dict = {
-            'subject': request.form['subject'],
-            'date': request.form['date'],
-            'homework': request.form['homework'],
-        }
-        return render_template('teacher_show_homework.html',
-                               subject=rec_dict['subject'],
-                               date=rec_dict['date'],
-                               homework=rec_dict['homework'])
+    days = {'Понедельник': [[x, session.query(Homeworks).filter(Homeworks.date == week_dates['Понедельник'], Homeworks.subject == x, Homeworks.class_id == cls_cur.cl_id).first()] for x in sch['mon']],
+            'Вторник': [[x, session.query(Homeworks).filter(Homeworks.date == week_dates['Вторник'], Homeworks.subject == x, Homeworks.class_id == cls_cur.cl_id).first()] for x in sch['tue']],
+            'Среда': [[x, session.query(Homeworks).filter(Homeworks.date == week_dates['Среда'], Homeworks.subject == x, Homeworks.class_id == cls_cur.cl_id).first()] for x in sch['wed']],
+            'Четверг': [[x, session.query(Homeworks).filter(Homeworks.date == week_dates['Четверг'], Homeworks.subject == x, Homeworks.class_id == cls_cur.cl_id).first()] for x in sch['thu']],
+            'Пятница': [[x, session.query(Homeworks).filter(Homeworks.date == week_dates['Пятница'], Homeworks.subject == x, Homeworks.class_id == cls_cur.cl_id).first()] for x in sch['fri']]
+            }
+    rngs = loads(session.query(Classes).filter(Classes.cl_id == current_user.class_id).first().time_schedule)
+    times = rngs['day']
+    return render_page(['admin', 'teacher'], '/teacher/homework/0', 'teacher_homework.html',
+                       class_name=class_name,
+                       days=days,
+                       week_dates=week_dates,
+                       n=int(n),
+                       datetime=datetime.datetime,
+                       times=times)
 
 
 @app.route('/student/diary')
@@ -229,7 +287,7 @@ def student_diary():
             'Пятница': [['Окружающий мир', '..'], ['Математика', '....'], ['Музыка', '..'], ['Литература', '..'],
                         ['', '']]
             }
-    return render_template('student_diary.html', days=days)
+    return render_page(['admin', 'student'], '/student/diary', 'student_diary.html', days=days)
 
 
 @app.route('/student/schedule')
@@ -243,7 +301,7 @@ def student_schedule():
             'Четверг': ['География', 'Физ-ра', 'Математика', 'Русский язык', '-'],
             'Пятница': ['Окружающий мир', 'Математика', 'Музыка', 'Литература', '-']
             }
-    return render_template('student_schedule.html', days=days)
+    return render_page(['admin', 'student'], '/student/schedule', 'student_schedule.html', days=days)
 
 
 @app.route('/student/grade')
@@ -254,12 +312,12 @@ def student_grade():
     grd_sum = {'subg1': round(sum(grades['subg1']) / len(grades['subg1']), 2),
                'subg2': round(sum(grades['subg2']) / len(grades['subg2']), 2),
                'subg3': round(sum(grades['subg3']) / len(grades['subg3']), 2)}
-    return render_template('student_grade.html', grades=grades, grd_sum=grd_sum)
+    return render_page(['admin', 'student'], '/student/grade', 'student_grade.html', grades=grades, grd_sum=grd_sum)
 
 
-@app.route('/student/profile')
+@app.route('/profile')
 def student_profile():
-    return render_template('student_profile.html')
+    return render_page(['admin', 'teacher', 'student'], '/profile', 'page_profile.html')
 
 
 def get_menu(role):
@@ -268,8 +326,7 @@ def get_menu(role):
     :param role:
     :return:
     """
-    db_sess = db_session.create_session()
-    items = db_sess.query(Menu).filter(Menu.roles.ilike(f'%{role}%')).all()
+    items = session.query(Menu).filter(Menu.roles.ilike(f'%{role}%')).all()
     menu = dict()
     section = ""
     for item in items:
@@ -295,16 +352,14 @@ def render_page(roles, ref, template, **context):
     if not login_fresh():
         return render_403()
     else:
-        db_sess = db_session.create_session()
-        user = db_sess.query(Users).filter(Users.login == current_user.login and Users.active == 1).first()
-        if user.role in roles:
-            menu = get_menu(user.role)
+        if current_user.role in roles:
+            menu = get_menu(current_user.role)
             if not context:
                 context = dict()
             context["menu"] = menu
             context["ref"] = ref
-            context["role"] = user.role
-            context["username"] = f"{user.name} {user.surname[0]}."
+            context["role"] = current_user.role
+            context["username"] = f"{current_user.name} {current_user.surname[0]}."
             return render_template(template, **context)
         else:
             return render_403()

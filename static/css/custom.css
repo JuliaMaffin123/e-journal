@@ -887,7 +887,7 @@ a:focus {
 }
 .panel_toolbox {
     float: right;
-    min-width: 70px
+    /* min-width: 70px */
 }
 .panel_toolbox>li {
     float: left;
@@ -1008,7 +1008,7 @@ article.media {
     float: left
 }
 h2 {
-    font-size: 30px;
+    font-size: 18px;
     font-weight: 400
 }
 #left,
@@ -4303,4 +4303,22 @@ table.dataTable thead .sorting, table.dataTable thead .sorting_asc, table.dataTa
 }
 .modal {
     top: 25%;
+}
+.sheduler-icon {
+    float: right;
+}
+.nav-week {
+    width: 100%;
+}
+.nav-week li.prev-week {
+    float: left;
+}
+.nav-week li.next-week {
+    float: right;
+}
+.nav-week a {
+    color: #33b76d !important;
+}
+.td-edit:hover {
+    background: #bee7af;
 }

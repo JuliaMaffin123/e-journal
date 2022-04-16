@@ -1,8 +1,11 @@
-{% extends "teacher_homework.html" %}
+{% extends "page_base.html" %}
 
 {% block homework %}
 <h4>Вы только что добавили домашнее задание!</h4>
 <div>Предмет: {{ subject }}</div>
 <div>Дата: {{ date }}</div>
 <div>Домашнее задание: {{ homework }}</div>
+{% endblock %}
+
+{% block scripts %}
 {% endblock %}

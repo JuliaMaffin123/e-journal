@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
-from flask_login import UserMixin
 from data.db_session import ORMBase
+from flask_login import UserMixin
 
 
 class Users(ORMBase, UserMixin):

@@ -1,21 +1,172 @@
-{% extends "teacher_base.html" %}
+{% extends "page_base.html" %}
+
+{% block title %}Домашние задания{% endblock %}
 
 {% block content %}
-<body>
-<h1 align="center">Вход в систему</h1>
-<div>
-    <form class="login_form" method="post">
-        <input type="login" class="form-control" id="subject" aria-describedby="loginHelp"
-               placeholder="Название предмета" name="subject">
-        <input type="login" class="form-control" id="date" aria-describedby="loginHelp"
-               placeholder="Число, на которое задано" name="date">
-        <input type="login" class="form-control" id="homework" aria-describedby="loginHelp"
-               placeholder="Домашнее задание" name="homework">
-        <button type="submit" class="btn btn-primary">Добавить</button>
-    </form>
+{% set a = {'01': 'января', '02': 'февраля', '03': 'марта', '04': 'апреля', '05': 'мая', '06': 'июня', '07': 'июля', '08': 'августа', '09': 'сентября', '10': 'октября', '11': 'ноября', '12': 'декабря'} %}
+
+<div class="">
+    <div class="page-title">
+        <div class="title_left">
+            <h3>Домашние задания для <b><span style="color: #5d8e5a;">{{ class_name }}</span></b> класса</h3>
+        </div>
+        <div class="clearfix"></div>
+
+        <div class="row">
+            <nav aria-label="Page navigation">
+                <ul class="pagination nav-week">
+                    <li class="page-item prev-week">
+                        <a class="page-link" href={{n - 1}}><i class="fa fa-angle-double-left"></i> Предыдущая неделя</a>
+                    </li>
+                    <li class="page-item next-week">
+                        <a class="page-link" href={{n + 1}}>Следующая неделя <i class="fa fa-angle-double-right"></i></a>
+                    </li>
+                </ul>
+            </nav>
+
+            {% for day in days.keys() %}
+            {% set tod_d = datetime.strptime(week_dates[day], '%Y-%m-%d') %}
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2><i class="fa fa-calendar"></i> {{day}}<small> {{tod_d.day}} {{a[week_dates[day].split('-')[1]]}}</small></h2>
+							<ul class="nav navbar-right panel_toolbox">
+							  <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+							  <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+							</ul>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+
+                        <table align="center" class="table table-bordered table-homework">
+                            {% for i in range(5) %}
+                            <tr>
+                                <td width="10">{{ times[i] }}</td>
+                                {% if days[day][i] and days[day][i][0] != None %}
+                                <td align="center" width="150">{{ days[day][i][0] }}</td>
+                                {% else %}
+                                <td align="center" width="150">--</td>
+                                {% endif %}
+                                {% if days[day][i] and days[day][i][1] != None %}
+                                <td>{{ days[day][i][1].homework }}</td>
+                                {% else %}
+                                <td>&nbsp;</td>
+                                {% endif %}
+                                {% if days[day][i] %}
+                                <td align="center" width="50" class="td-edit"
+                                    data-clas="{{ class_name }}"
+                                    data-date="{{ week_dates[day] }}"
+                                    data-time="{{ times[i] }}"
+                                    data-subj="{{ days[day][i][0] }}"
+                                    data-homework="{{ days[day][i][1].homework }}"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modal"
+                                >
+                                    <i class="fa fa-pencil"></i>
+                                </td>
+                                {% else %}
+                                <td>&nbsp;</td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
 </div>
-<div>
-    {% block homework %}{% endblock %}
+
+<!-- MODAL -->
+<div class="modal" id="modal" tabindex="-1" role="dialog" aria-labelledby="dialogLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true"><i class="fa fa-times-circle-o"></i></span></button>
+                <h4 class="modal-title" id="dialogLabel"><i class="fa fa-pencil"></i> Изменение домашнего задания</h4>
+            </div>
+            <div class="modal-body" id="modal_body">
+                <form id="editForm" action="" method="POST" class="form-horizontal form-label-left" novalidate>
+                    <input id="date" name="date" type="hidden">
+                    <div class="item form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="clas">Класс</label>
+                        <div class="col-md-8 col-sm-8 col-xs-12">
+                            <input id="clas" name="clas" class="form-control col-md-7 col-xs-12" type="text" readonly>
+                        </div>
+                    </div>
+                    <div class="item form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="subj">Предмет</label>
+                        <div class="col-md-8 col-sm-8 col-xs-12">
+                            <input id="subj" name="subj" class="form-control col-md-7 col-xs-12" type="text" readonly>
+                        </div>
+                    </div>
+                    <div class="item form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="time">Дата</label>
+                        <div class="col-md-8 col-sm-8 col-xs-12">
+                            <input id="time" name="time" class="form-control col-md-7 col-xs-12" type="text" readonly>
+                        </div>
+                    </div>
+                    <div class="item form-group">
+                        <label class="control-label col-md-3 col-sm-3 col-xs-12" for="homework">Задание</label>
+                        <div class="col-md-8 col-sm-8 col-xs-12">
+                            <textarea id="homework" name="homework" class="form-control col-md-7 col-xs-12"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
+                <button type="button" class="btn btn-success" id="saveButton">Сохранить</button>
+            </div>
+        </div>
+    </div>
 </div>
-</body>
+
+{% endblock %}
+{% block scripts %}
+<script>
+    $(function() {
+        $(".td-edit").click(function() {
+            var clas = $(this).attr('data-clas');
+            var date = $(this).attr('data-date');
+            var time = $(this).attr('data-time');
+            var subj = $(this).attr('data-subj');
+            var homework = $(this).attr('data-homework');
+
+            $("#date").attr('value', date);
+            $("#clas").attr('value', clas);
+            $("#time").attr('value', date + ' ' + time);
+            $("#subj").attr('value', subj);
+            if (homework != 'None') {
+                $("#homework").val(homework);
+            }
+
+            $('#modal').modal();
+        })
+    });
+
+    $('#saveButton').on('click', function(e) {
+        e.preventDefault();
+        document.getElementById("editForm").submit();
+        return false;
+    });
+</script>
+<!--<body>-->
+<!--<h1 align="center">Вход в систему</h1>-->
+<!--<div>-->
+<!--    <form class="login_form" method="post">-->
+<!--        <input type="login" class="form-control" id="subject" aria-describedby="loginHelp"-->
+<!--               placeholder="Название предмета" name="subject">-->
+<!--        <input type="login" class="form-control" id="date" aria-describedby="loginHelp"-->
+<!--               placeholder="Число, на которое задано" name="date">-->
+<!--        <input type="login" class="form-control" id="homework" aria-describedby="loginHelp"-->
+<!--               placeholder="Домашнее задание" name="homework">-->
+<!--        <button type="submit" class="btn btn-primary">Добавить</button>-->
+<!--    </form>-->
+<!--</div>-->
+<!--<div>-->
+<!--    {% block homework %}{% endblock %}-->
+<!--</div>-->
+<!--</body>-->
 {% endblock %}

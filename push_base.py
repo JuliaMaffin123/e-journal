@@ -19,17 +19,26 @@ clas.schedule = dumps({"mon": ["Алгебра", "Литература", "Инф
                        "wed": ["Русский", "Геометрия", "География", "Химия", "Биология"],
                        "thu": ["Литература", "Физ-ра", "Информатика", "Английский"],
                        "fri": ["Биология", "Русский", "Музыка", "ИЗО"]})
-clas.time_schedule = dumps({"day": ["8:00", "8:50", "9:40", "10:40", "11:30"]})
+clas.time_schedule = dumps({"day": ["08:00", "08:50", "09:40", "10:40", "11:30"]})
+session.add(clas)
+
+clas = Classes()
+clas.number = 5
+clas.letter = 'Б'
+clas.schedule = dumps({"mon": ["Литература", "Информатика", "Английский", "Алгебра"],
+                       "tue": ["География", "Литература", "Физика", "История", "Физ-ра"],
+                       "wed": ["Геометрия", "География", "Химия", "Биология", "Русский"],
+                       "thu": ["Физ-ра", "Информатика", "Английский", "Литература"],
+                       "fri": ["Русский", "Музыка", "ИЗО", "Биология"]})
+clas.time_schedule = dumps({"day": ["08:00", "08:50", "09:40", "10:40", "11:30"]})
 session.add(clas)
 
 # ДОМАШКИ
 hm = Homeworks()
-hm.date = dt.datetime.date(dt.datetime.today())  # получается из формы бррр
+hm.date = '2022-04-11'
 hm.subject = 'Алгебра'
-hm.class_num = 5
-hm.class_name = 'А'
+hm.class_id = 1
 hm.homework = 'Номер 1, 2 и 3 стр. 115'
-
 session.add(hm)
 
 # ПОЛЬЗОВАТЕЛИ
@@ -76,7 +85,6 @@ th.password = 'teacher-1'
 th.class_id = 1
 th.active = 1
 session.add(th)
-session.commit()
 
 # РОЛИ
 r1 = Role()
@@ -98,7 +106,6 @@ r4 = Role()
 r4.name = 'guest'
 r4.start_page = '/'
 session.add(r4)
-session.commit()
 
 # МЕНЮ
 item = Menu()
@@ -150,7 +157,7 @@ item.name = "homework"
 item.section = "teacher-section"
 item.title = "Домашнее задание"
 item.icon = "fa fa-briefcase"
-item.ref = "/teacher/homework"
+item.ref = "/teacher/homework/0"
 item.roles = "admin|teacher"
 item.order = 12
 session.add(item)
@@ -177,7 +184,7 @@ item.name = "diary"
 item.section = "student-section"
 item.title = "Дневник"
 item.icon = "fa fa-book"
-item.ref = "/student/diary"
+item.ref = "/student/diary/0"
 item.roles = "admin|student"
 item.order = 21
 session.add(item)
@@ -187,7 +194,7 @@ item.name = "schedule"
 item.section = "student-section"
 item.title = "Расписание"
 item.icon = "fa fa-tasks"
-item.ref = "/student/diary"
+item.ref = "/student/schedule"
 item.roles = "admin|student"
 item.order = 22
 session.add(item)
