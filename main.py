@@ -10,6 +10,7 @@ from wtforms.validators import DataRequired, Length, EqualTo
 
 from data import db_session
 from data.classes import Classes
+from data.grades import Grade
 from data.homeworks import Homeworks
 from data.menu import Menu
 from data.role import Role
@@ -274,6 +275,51 @@ def teacher_homework(n):
                        n=int(n),
                        datetime=datetime.datetime,
                        times=times)
+
+
+@app.route('/teacher/grade/<subj>', methods=['POST', 'GET'])
+def teacher_grade(subj):
+    if request.method == 'POST':
+        gr = Grade()
+        gr.date = request.form['date']
+        gr.subject = subj
+        gr.user_id = request.form['id']
+        gr.grade = request.form['grade']
+        gr.reason = request.form['reason']
+        session.add(gr)
+        session.commit()
+        return redirect(f"/teacher/grade/{subj}")
+    elif request.method == 'GET':
+        cls_cur = session.query(Classes).filter(Classes.cl_id == current_user.class_id).first()
+        class_name = str(cls_cur.number) + '-' + cls_cur.letter
+        lst_obj = ['Русский', 'Английский', 'Алгебра', 'Литература', 'Информатика', 'ИЗО', 'Физ-ра', 'Музыка']
+        reason_obj = ['Домашняя работа', 'Работа в классе', 'Самостоятельная', 'Контрольная']
+        std_all_inf = session.query(Users).filter(Users.class_id == current_user.class_id,
+                                                  Users.role == 'student').all()
+        grades_list = dict()
+        for std in std_all_inf:
+            key = f'{std.surname} {std.name} {std.otchestvo}'
+            grades_list[key] = session.query(Grade).filter(Grade.user_id == std.id, Grade.subject == subj).all()
+            if grades_list[key] is None:
+                grades_list[key] = list()
+            else:
+                grades_std = list()
+                for d in grades_list[key]:
+                    grades_std.append([d.grade, d.reason])
+                grades_list[key] = (grades_std, std.id)
+        students = list()
+        for k in grades_list.keys():
+            if len(grades_list[k]) != 0:
+                grades, id = grades_list[k]
+                students.append([k, grades, round(0 if len(grades) == 0 else sum([x[0] for x in grades]) / len(grades), 2), id])
+            else:
+                students.append([k, '', 0.0])
+        return render_page(['admin', 'teacher'], '/teacher/grade/Русский', 'teacher_grade.html',
+                           class_name=class_name,
+                           students=students,
+                           obj=subj,
+                           lst_obj=lst_obj,
+                           reason_obj=reason_obj)
 
 
 @app.route('/student/diary')

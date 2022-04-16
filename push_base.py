@@ -167,7 +167,7 @@ item.name = "grade"
 item.section = "teacher-section"
 item.title = "Оценки"
 item.icon = "fa fa-graduation-cap"
-item.ref = "/teacher/grade"
+item.ref = "/teacher/grade/Русский"
 item.roles = "admin|teacher"
 item.order = 13
 session.add(item)
