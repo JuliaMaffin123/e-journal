@@ -317,7 +317,16 @@ def student_grade():
 
 @app.route('/profile')
 def student_profile():
-    return render_page(['admin', 'teacher', 'student'], '/profile', 'page_profile.html')
+    cur_cl = session.query(Classes).filter(Classes.cl_id == current_user.class_id).first()
+    data = {'имя': current_user.name,
+            'фамилия': current_user.surname,
+            'отчество': current_user.otchestvo,
+            'статус': 'администратор' if current_user.role == 'admin' else 'учитель' if current_user.role == 'teacher' else 'ученик',
+            'класс': str(cur_cl.number) + '-' + cur_cl.letter,
+            'role': current_user.role,
+            'login': current_user.login
+            }
+    return render_page(['admin', 'teacher', 'student'], '/profile', 'page_profile.html', data=data)
 
 
 def get_menu(role):

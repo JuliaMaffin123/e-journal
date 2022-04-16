@@ -3,6 +3,56 @@
 {% block title %}Профиль{% endblock %}
 
 {% block content %}
-<br><br><br>
-Профиль
+<div class="">
+    <div class="page-title">
+        <div class="title_left">
+            <h3>Профиль пользователя</h3>
+        </div>
+        <div class="clearfix"></div>
+
+        <div class="row">
+            <div class="col-md-6 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2><i class="fa fa-user"></i> {{ data['login'] }}</h2>
+							<ul class="nav navbar-right panel_toolbox">
+							  <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+							  <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+							</ul>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <div class="col-md-4 col-sm-3 col-xs-12 profile_left">
+                            <div class="profile_img">
+                                <div id="crop-avatar">
+                                    <!-- Current avatar -->
+                                    <img class="img-responsive avatar-view" src="/static/images/{{ data['role'] }}.png" alt="Avatar" style="width:200px;">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-8 col-sm-9 col-xs-12">
+                            <dl class="row">
+                                <dt class="col-sm-4">Фамилия:</dt>
+                                <dd class="col-sm-8">{{ data['фамилия'] }}</dd>
+                                <div class="clearfix"></div>
+                                <dt class="col-sm-4">Имя:</dt>
+                                <dd class="col-sm-8">{{ data['имя'] }}</dd>
+                                <div class="clearfix"></div>
+                                <dt class="col-sm-4">Отчество:</dt>
+                                <dd class="col-sm-8">{{ data['отчество'] }}</dd>
+                                <div class="clearfix"></div>
+                                <dt class="col-sm-4">Статус:</dt>
+                                <dd class="col-sm-8">{{ data['статус'] }}</dd>
+                                <div class="clearfix"></div>
+                                <dt class="col-sm-4">Класс:</dt>
+                                <dd class="col-sm-8">{{ data['класс'] }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
