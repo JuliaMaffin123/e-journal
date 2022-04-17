@@ -189,6 +189,7 @@ def admin_users():
                 user.class_id = form.class_id.data
                 user.active = 1 if form.active.data else 0
                 session.commit()
+                return redirect("/admin/users")
             else:
                 print(f"Что-то пошло не так... Пользоватеь с id={form.id.data} не найден!")
     # Начитаем данные и заустим страницу
@@ -248,6 +249,7 @@ def teacher_homework(n):
             hw.homework = homework
             session.add(hw)
         session.commit()
+        return redirect(f"/teacher/homework/{n}")
     class_name = str(cls_cur.number) + '-' + cls_cur.letter
     today = datetime.datetime.today()
     today_weekday = datetime.datetime.today().weekday()
@@ -338,16 +340,21 @@ def student_diary():
 
 @app.route('/student/schedule')
 def student_schedule():
-    # for user in session.query(Students).filter(Students.name.like('%Вася%')):
-    #    d_us = user.class_id.schedule
-    #    print(loads(d_us))
-    days = {'Понедельник': ['Математика', 'Русский язык', 'Окружающий мир', 'Литература', '-'],
-            'Вторник': ['ИЗО', 'Математика', 'Русский язык', 'Физ-ра', 'Английский язык'],
-            'Среда': ['История', 'Информатика', 'Русский язык', 'Технология', '-'],
-            'Четверг': ['География', 'Физ-ра', 'Математика', 'Русский язык', '-'],
-            'Пятница': ['Окружающий мир', 'Математика', 'Музыка', 'Литература', '-']
+    """
+    Страница расписания занятий для учеников
+    :return:
+    """
+    clas = session.query(Classes).filter(Classes.cl_id == current_user.class_id).first()
+    sch = loads(session.query(Classes).filter(Classes.cl_id == current_user.class_id).first().schedule)
+    days = {'Понедельник': [x for x in sch['mon']],
+            'Вторник': [x for x in sch['tue']],
+            'Среда': [x for x in sch['wed']],
+            'Четверг': [x for x in sch['thu']],
+            'Пятница': [x for x in sch['fri']]
             }
-    return render_page(['admin', 'student'], '/student/schedule', 'student_schedule.html', days=days)
+    rngs = loads(session.query(Classes).filter(Classes.cl_id == current_user.class_id).first().time_schedule)
+    times = rngs['day']
+    return render_page(['admin', 'student'], '/student/schedule', 'teacher_schedule.html', days=days, times=times, clas=clas)
 
 
 @app.route('/student/grade')
