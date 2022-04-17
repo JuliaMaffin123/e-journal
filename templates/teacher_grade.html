@@ -51,13 +51,13 @@
                                 <td>
                                     {% for gr in student[1] %}
                                     {% if gr[0] == 5 %}
-                                    <button type="button" class="btn btn-success" title="{{gr[1]}}">{{gr[0]}}</button>
+                                    <button type="button" class="btn btn-success" title="{{gr[2]}}: {{gr[1]}}">{{gr[0]}}</button>
                                     {% elif gr[0] == 4 %}
-                                    <button type="button" class="btn btn-info" title="{{gr[1]}}">{{gr[0]}}</button>
+                                    <button type="button" class="btn btn-info" title="{{gr[2]}}: {{gr[1]}}">{{gr[0]}}</button>
                                     {% elif gr[0] == 3 %}
-                                    <button type="button" class="btn btn-warning" title="{{gr[1]}}">{{gr[0]}}</button>
+                                    <button type="button" class="btn btn-warning" title="{{gr[2]}}: {{gr[1]}}">{{gr[0]}}</button>
                                     {% else %}
-                                    <button type="button" class="btn btn-danger" title="{{gr[1]}}">{{gr[0]}}</button>
+                                    <button type="button" class="btn btn-danger" title="{{gr[2]}}: {{gr[1]}}">{{gr[0]}}</button>
                                     {% endif %}
                                     {% endfor %}
                                 </td>

@@ -31,13 +31,13 @@
                                         <div class="col-md-9 col-sm-9 col-xs-12">
                                         {% for gr in grades[subj] %}
                                             {% if gr.grade == 5 %}
-                                            <button type="button" class="btn btn-success" title="{{gr.reason}}">{{gr.grade}}</button>
+                                            <button type="button" class="btn btn-success" title="{{gr.date}}: {{gr.reason}}">{{gr.grade}}</button>
                                             {% elif gr.grade == 4 %}
-                                            <button type="button" class="btn btn-info" title="{{gr.reason}}">{{gr.grade}}</button>
+                                            <button type="button" class="btn btn-info" title="{{gr.date}}: {{gr.reason}}">{{gr.grade}}</button>
                                             {% elif gr.grade == 3 %}
-                                            <button type="button" class="btn btn-warning" title="{{gr.reason}}">{{gr.grade}}</button>
+                                            <button type="button" class="btn btn-warning" title="{{gr.date}}: {{gr.reason}}">{{gr.grade}}</button>
                                             {% else %}
-                                            <button type="button" class="btn btn-danger" title="{{gr.reason}}">{{gr.grade}}</button>
+                                            <button type="button" class="btn btn-danger" title="{{gr.date}}: {{gr.reason}}">{{gr.grade}}</button>
                                             {% endif %}
                                         {% endfor %}
                                         </div>

@@ -307,7 +307,7 @@ def teacher_grade(subj):
             else:
                 grades_std = list()
                 for d in grades_list[key]:
-                    grades_std.append([d.grade, d.reason])
+                    grades_std.append([d.grade, d.reason, d.date])
                 grades_list[key] = (grades_std, std.id)
         students = list()
         for k in grades_list.keys():
