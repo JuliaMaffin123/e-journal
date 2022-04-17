@@ -3,51 +3,87 @@
 {% block title %}Дневник{% endblock %}
 
 {% block content %}
-<br><br><br>
-<div class="main">
-    <div class="container">
-        <h1 align="center">Дневник</h1>
-        </br>
-        {% for day in days.keys() %}
-        <h4 align="center">{{day}}</h4>
-        <table align="center" class="table table-bordered">
-            <tr>
-                <td width="10">08:30</td>
-                <td align="center" width="150">{{ days[day][0][0] }}</td>
-                <td>{{ days[day][0][1] }}</td>
-                <td width="60"></td>
-            </tr>
-            <tr>
-                <td width="10">09:25</td>
-                <td align="center" width="150">{{ days[day][1][0] }}</td>
-                <td>{{ days[day][1][1] }}</td>
-                <td width="60"></td>
-            </tr>
-            <tr>
-                <td width="10">10:30</td>
-                <td align="center" width="150">{{ days[day][2][0] }}</td>
-                <td>{{ days[day][2][1] }}</td>
-                <td width="60"></td>
-            </tr>
-            <tr>
-                <td width="10">11:25</td>
-                <td align="center" width="150">{{ days[day][3][0] }}</td>
-                <td>{{ days[day][3][1] }}</td>
-                <td width="60"></td>
-            </tr>
-            <tr>
-                <td width="10">12:30</td>
-                <td align="center" width="150">{{ days[day][4][0] }}</td>
-                <td>{{ days[day][4][1] }}</td>
-                <td width="60"></td>
-            </tr>
-            </br>
-        </table>
-        {% endfor %}
-        </br>
+{% set a = {'01': 'января', '02': 'февраля', '03': 'марта', '04': 'апреля', '05': 'мая', '06': 'июня', '07': 'июля', '08': 'августа', '09': 'сентября', '10': 'октября', '11': 'ноября', '12': 'декабря'} %}
+
+<div class="">
+    <div class="page-title">
+        <div class="title_left">
+            <h3>Дневник</h3>
+        </div>
+        <div class="clearfix"></div>
+
+        <div class="row">
+            <nav aria-label="Page navigation">
+                <ul class="pagination nav-week">
+                    <li class="page-item prev-week">
+                        <a class="page-link" href={{n - 1}}><i class="fa fa-angle-double-left"></i> Предыдущая неделя</a>
+                    </li>
+                    <li class="page-item next-week">
+                        <a class="page-link" href={{n + 1}}>Следующая неделя <i class="fa fa-angle-double-right"></i></a>
+                    </li>
+                </ul>
+            </nav>
+
+            {% for day in days.keys() %}
+            {% set tod_d = datetime.strptime(week_dates[day], '%Y-%m-%d') %}
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2><i class="fa fa-calendar"></i> {{day}}<small> {{tod_d.day}} {{a[week_dates[day].split('-')[1]]}}</small></h2>
+							<ul class="nav navbar-right panel_toolbox">
+							  <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+							  <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+							</ul>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+
+                        <table align="center" class="table table-bordered table-homework">
+                            {% for i in range(5) %}
+                            <tr>
+                                <td width="10">{{ times[i] }}</td>
+                                {% if days[day][i] and days[day][i][0] != None %}
+                                <td align="center" width="150">{{ days[day][i][0] }}</td>
+                                {% else %}
+                                <td align="center" width="150">--</td>
+                                {% endif %}
+                                {% if days[day][i] and days[day][i][1] != None %}
+                                <td>{{ days[day][i][1].homework }}</td>
+                                {% else %}
+                                <td>&nbsp;</td>
+                                {% endif %}
+                                {% if days[day][i] and days[day][i][2] != None %}
+                                <td align="center" width="50" class="td-grade">
+                                    {% for gr in days[day][i][2] %}
+                                    {% if gr.grade == 5 %}
+                                    <button type="button" class="btn-xs btn-success" title="{{gr.reason}}">{{gr.grade}}</button>
+                                    {% elif gr.grade == 4 %}
+                                    <button type="button" class="btn-xs btn-info" title="{{gr.reason}}">{{gr.grade}}</button>
+                                    {% elif gr.grade == 3 %}
+                                    <button type="button" class="btn-xs btn-warning" title="{{gr.reason}}">{{gr.grade}}</button>
+                                    {% else %}
+                                    <button type="button" class="btn-xs btn-danger" title="{{gr.reason}}">{{gr.grade}}</button>
+                                    {% endif %}
+                                    {% endfor %}
+                                </td>
+                                {% else %}
+                                <td>&nbsp;</td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
 </div>
-{% endblock %}
 
+
+{% endblock %}
 {% block scripts %}
+<script>
+
+</script>
 {% endblock %}

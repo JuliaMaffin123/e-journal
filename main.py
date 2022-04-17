@@ -324,18 +324,55 @@ def teacher_grade(subj):
                            reason_obj=reason_obj)
 
 
-@app.route('/student/diary')
-def student_diary():
-    days = {'Понедельник': [['Математика', '...'], ['Русский язык', '..'], ['Окружающий мир', ''], ['Литература', ''],
-                            ['', '']],
-            'Вторник': [['ИЗО', '.'], ['Математика', '...'], ['Русский язык', ''], ['Физ-ра', ''],
-                        ['Английский язык', '.']],
-            'Среда': [['История', '.'], ['Информатика', ''], ['Русский язык', '.'], ['Технология', '..'], ['', '']],
-            'Четверг': [['География', '..'], ['Физ-ра', '.'], ['Математика', ''], ['Русский язык', '.'], ['', '']],
-            'Пятница': [['Окружающий мир', '..'], ['Математика', '....'], ['Музыка', '..'], ['Литература', '..'],
-                        ['', '']]
+@app.route('/student/diary/<n>')
+def student_diary(n):
+    """
+    Дневник ученика
+    :return:
+    """
+    cls_cur = session.query(Classes).filter(Classes.cl_id == current_user.class_id).first()
+    class_name = str(cls_cur.number) + '-' + cls_cur.letter
+    today = datetime.datetime.today()
+    today_weekday = datetime.datetime.today().weekday()
+    week_dates = {'Понедельник': str(today - datetime.timedelta(days=(today_weekday - 0 - (int(n) * 7)))).split(' ')[0],
+                  'Вторник': str(today - datetime.timedelta(days=(today_weekday - 1 - (int(n) * 7)))).split(' ')[0],
+                  'Среда': str(today - datetime.timedelta(days=(today_weekday - 2 - (int(n) * 7)))).split(' ')[0],
+                  'Четверг': str(today - datetime.timedelta(days=(today_weekday - 3 - (int(n) * 7)))).split(' ')[0],
+                  'Пятница': str(today - datetime.timedelta(days=(today_weekday - 4 - (int(n) * 7)))).split(' ')[0],
+                  'Суббота': str(today - datetime.timedelta(days=(today_weekday - 5 - (int(n) * 7)))).split(' ')[0],
+                  'Воскресенье': str(today - datetime.timedelta(days=(today_weekday - 6 - (int(n) * 7)))).split(' ')[0]}
+    sch = loads(session.query(Classes).filter(Classes.cl_id == current_user.class_id).first().schedule)
+
+    days = {'Понедельник': [[x,
+                             session.query(Homeworks).filter(Homeworks.date == week_dates['Понедельник'], Homeworks.subject == x, Homeworks.class_id == cls_cur.cl_id).first(),
+                             session.query(Grade).filter(Grade.user_id == current_user.id, Grade.subject == x, Grade.date == week_dates['Понедельник']).all()
+                             ] for x in sch['mon']],
+            'Вторник': [[x,
+                         session.query(Homeworks).filter(Homeworks.date == week_dates['Вторник'], Homeworks.subject == x, Homeworks.class_id == cls_cur.cl_id).first(),
+                         session.query(Grade).filter(Grade.user_id == current_user.id, Grade.subject == x, Grade.date == week_dates['Вторник']).all()
+                         ] for x in sch['tue']],
+            'Среда': [[x,
+                       session.query(Homeworks).filter(Homeworks.date == week_dates['Среда'], Homeworks.subject == x, Homeworks.class_id == cls_cur.cl_id).first(),
+                       session.query(Grade).filter(Grade.user_id == current_user.id, Grade.subject == x, Grade.date == week_dates['Среда']).all()
+                       ] for x in sch['wed']],
+            'Четверг': [[x,
+                         session.query(Homeworks).filter(Homeworks.date == week_dates['Четверг'], Homeworks.subject == x, Homeworks.class_id == cls_cur.cl_id).first(),
+                         session.query(Grade).filter(Grade.user_id == current_user.id, Grade.subject == x, Grade.date == week_dates['Четверг']).all()
+                         ] for x in sch['thu']],
+            'Пятница': [[x,
+                         session.query(Homeworks).filter(Homeworks.date == week_dates['Пятница'], Homeworks.subject == x, Homeworks.class_id == cls_cur.cl_id).first(),
+                         session.query(Grade).filter(Grade.user_id == current_user.id, Grade.subject == x, Grade.date == week_dates['Пятница']).all()
+                         ] for x in sch['fri']]
             }
-    return render_page(['admin', 'student'], '/student/diary', 'student_diary.html', days=days)
+    rngs = loads(session.query(Classes).filter(Classes.cl_id == current_user.class_id).first().time_schedule)
+    times = rngs['day']
+    return render_page(['admin', 'student'], '/student/diary/0', 'student_diary.html',
+                       class_name=class_name,
+                       days=days,
+                       week_dates=week_dates,
+                       n=int(n),
+                       datetime=datetime.datetime,
+                       times=times)
 
 
 @app.route('/student/schedule')
@@ -359,12 +396,13 @@ def student_schedule():
 
 @app.route('/student/grade')
 def student_grade():
-    grades = {'subg1': [5, 4, 3, 5], 'subg2': [5, 4, 5, 5, 5, 5],
-              'subg3': [5, 4, 4, 4, 5]
-              }
-    grd_sum = {'subg1': round(sum(grades['subg1']) / len(grades['subg1']), 2),
-               'subg2': round(sum(grades['subg2']) / len(grades['subg2']), 2),
-               'subg3': round(sum(grades['subg3']) / len(grades['subg3']), 2)}
+    lst_subj = ['Русский', 'Английский', 'Алгебра', 'Литература', 'Информатика', 'ИЗО', 'Физ-ра', 'Музыка']
+    grades = dict()
+    grd_sum = dict()
+    for subj in lst_subj:
+        grades[subj] = session.query(Grade).filter(Grade.user_id == current_user.id, Grade.subject == subj).all()
+        grades_list = [] if len(grades[subj]) == 0 else [x.grade for x in grades.get(subj)]
+        grd_sum[subj] = round(0 if len(grades_list) == 0 else sum(grades_list) / len(grades_list), 2)
     return render_page(['admin', 'student'], '/student/grade', 'student_grade.html', grades=grades, grd_sum=grd_sum)
 
 

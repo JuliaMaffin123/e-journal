@@ -99,7 +99,7 @@ session.add(r2)
 
 r3 = Role()
 r3.name = 'student'
-r3.start_page = 'student/diary'
+r3.start_page = 'student/diary/0'
 session.add(r3)
 
 r4 = Role()

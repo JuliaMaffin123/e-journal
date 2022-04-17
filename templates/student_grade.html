@@ -3,38 +3,57 @@
 {% block title %}Оценки{% endblock %}
 
 {% block content %}
-<br><br><br>
-<div class="main">
-    <div class="container">
-        <h1 align="center">Оценки</h1>
-        {% for obj in grades.keys() %}
-        <div class="accordion" id="accordionExample">
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="flush-headingOne">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
-                        {{obj}}
-                    </button>
-                </h2>
-                <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne"
-                     data-bs-parent="#accordionFlushExample">
-                    <div class="accordion-body">
-                        {% for grade in grades[obj] %}
-                        <button type="button" class="btn btn-outline-success" disabled>{{grade}}</button>
-                        {% endfor %}
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            Средний балл:
-                            <button type="button" class="btn btn-outline-primary me-md-2" disabled>{{grd_sum[obj]}}
-                            </button>
+<div class="">
+    <div class="page-title">
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2><i class="fa fa-align-left"></i> Оценки</h2>
+                        <ul class="nav navbar-right panel_toolbox">
+                          <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
+                          <li><a class="close-link"><i class="fa fa-close"></i></a></li>
+                        </ul>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <!-- start accordion -->
+                        <div class="accordion" id="accordion" role="tablist" aria-multiselectable="true">
+                            {% for subj in grades.keys() %}
+                            <div class="panel">
+                                <a class="panel-heading collapsed" role="tab" id="headingOne" data-toggle="collapse" data-parent="#accordion" href="#collapse-{{ subj }}" aria-expanded="true" aria-controls="collapse-{{ subj }}">
+                                    <h4 class="panel-title">{{ subj }}</h4>
+                                    <span class="navbar-right">Средний балл: <button type="button" class="btn btn-default me-md-2">{{grd_sum[subj]}}</button> <i class="fa fa-chevron-up"></i></span>
+                                </a>
+                                <div id="collapse-{{ subj }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne" aria-expanded="true" style="">
+                                    <div class="panel-body">
+                                        <!-- ОЦЕНКИ -->
+                                        <div class="col-md-9 col-sm-9 col-xs-12">
+                                        {% for gr in grades[subj] %}
+                                            {% if gr.grade == 5 %}
+                                            <button type="button" class="btn btn-success" title="{{gr.reason}}">{{gr.grade}}</button>
+                                            {% elif gr.grade == 4 %}
+                                            <button type="button" class="btn btn-info" title="{{gr.reason}}">{{gr.grade}}</button>
+                                            {% elif gr.grade == 3 %}
+                                            <button type="button" class="btn btn-warning" title="{{gr.reason}}">{{gr.grade}}</button>
+                                            {% else %}
+                                            <button type="button" class="btn btn-danger" title="{{gr.reason}}">{{gr.grade}}</button>
+                                            {% endif %}
+                                        {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
                         </div>
+                        <!-- end of accordion -->
                     </div>
                 </div>
             </div>
         </div>
-        <br>
-        {% endfor %}
     </div>
 </div>
+
 {% endblock %}
 
 {% block scripts %}

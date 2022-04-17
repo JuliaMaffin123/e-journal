@@ -59,8 +59,8 @@
                                     data-time="{{ times[i] }}"
                                     data-subj="{{ days[day][i][0] }}"
                                     data-homework="{{ days[day][i][1].homework }}"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#modal"
+                                    data-toggle="modal"
+                                    data-target="#modal"
                                 >
                                     <i class="fa fa-pencil"></i>
                                 </td>
@@ -78,7 +78,7 @@
     </div>
 </div>
 
-
+<!-- MODAL -->
 <div class="modal" id="modal" tabindex="-1" role="dialog" aria-labelledby="dialogLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -141,8 +141,6 @@
             if (homework != 'None') {
                 $("#homework").val(homework);
             }
-
-            $('#modal').modal();
         })
     });
 

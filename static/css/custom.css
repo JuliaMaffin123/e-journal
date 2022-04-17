@@ -4322,3 +4322,17 @@ table.dataTable thead .sorting, table.dataTable thead .sorting_asc, table.dataTa
 .td-edit:hover {
     background: #bee7af;
 }
+.td-grade {
+    padding: 5px !important;
+}
+.td-grade .btn-xs {
+    margin: 0;
+}
+.accordion .navbar-right {
+    display: block;
+    position: relative;
+    top: -25px;
+}
+.accordion .navbar-right .btn {
+    width: 50px;
+}
