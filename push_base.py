@@ -13,7 +13,7 @@ session = db_session.create_session()
 # КЛАССЫ
 clas = Classes()
 clas.number = 5
-clas.letter = 'A'
+clas.letter = 'А'
 clas.schedule = dumps({"mon": ["Алгебра", "Литература", "Информатика", "Английский"],
                        "tue": ["Физ-ра", "География", "Литература", "Физика", "История"],
                        "wed": ["Русский", "Геометрия", "География", "Химия", "Биология"],

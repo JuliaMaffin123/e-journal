@@ -60,6 +60,24 @@
 
 *В файле push_base.py Находится пример заполнения БД*
 
+**Также у приложения есть свое API:**
+
+Для получения полной информации о классе необходимо сделать запрос в формате: 
+
+"/api/<class_name>"
+
+Пример: "/api/5А"
+
+Пример программы:
+```python
+import json
+import requests
+
+response = requests.get(f'http://127.0.0.1:8080/api/5А')
+data = response.json()
+print(data)
+```
+
 
 ## Реализация базы данных:
 
@@ -96,6 +114,7 @@ pip install flask_login
 pip install flask_wtf
 pip install wtforms
 pip install sqlalchemy
+pip install flask_restful
 ```
 
 ### Запуск проекта
